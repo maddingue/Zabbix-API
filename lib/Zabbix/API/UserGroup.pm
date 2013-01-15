@@ -181,11 +181,11 @@ __END__
 
 =head1 NAME
 
-Zabbix::API::HostGroup -- Zabbix group objects
+Zabbix::API::UserGroup -- Zabbix usergroup objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::HostGroup;
+  use Zabbix::API::UserGroup;
 
   my $group = $zabbix->fetch(...);
 
@@ -193,10 +193,11 @@ Zabbix::API::HostGroup -- Zabbix group objects
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix group objects.
+Handles CRUD for Zabbix usergroup objects.
 
-This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the required
-methods are implemented (and in a very simple fashion on top of that).
+This is a very simple subclass of C<Zabbix::API::CRUDE>.  Only the
+required methods are implemented (and in a very simple fashion on top
+of that).
 
 =head1 METHODS
 
@@ -204,13 +205,30 @@ methods are implemented (and in a very simple fashion on top of that).
 
 =item name()
 
-Accessor for the hostgroup's name (the "name" attribute); returns the empty
-string if no name is set, for instance if the hostgroup has not been created on
-the server yet.
+Accessor for the usergroup's name (the "name" attribute); returns the
+empty string if no name is set, for instance if the usergroup has not
+been created on the server yet.
 
-=item hosts()
+=item users()
 
-Accessor for the hostgroup's hosts.
+Mutator for the usergroup's users.
+
+=item push()
+
+This method handles extraneous C<< user => Zabbix::API::User >>
+attributes in the users array, transforming them into C<userid>
+attributes, and pushing the users to the server if they don't exist
+already.  The original user attributes are kept but hidden from the
+C<CRUDE> C<push> method, and restored after the C<pull> method is
+called.
+
+This means you can put C<Zabbix::API::User> objects in your data and
+the module will Do The Right Thing (assuming you agree with my
+definition of the Right Thing).  Users that have been created this way
+will not be removed from the server if they are removed from the
+graph, however.
+
+Overriden from C<Zabbix::API::CRUDE>.
 
 =back
 
@@ -224,7 +242,7 @@ Fabrice Gabolde <fabrice.gabolde@uperto.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 SFR
+Copyright (C) 2013 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GPLv3.
