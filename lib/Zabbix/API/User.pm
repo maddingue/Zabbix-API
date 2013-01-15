@@ -103,7 +103,6 @@ sub add_to_usergroup {
 
     } elsif (not ref $usergroup_or_name) {
 
-        warn "there";
         $usergroup = $self->{root}->fetch('UserGroup', params => { filter => { name => $usergroup_or_name } })->[0];
 
         unless ($usergroup) {
