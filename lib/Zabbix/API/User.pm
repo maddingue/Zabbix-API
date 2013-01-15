@@ -45,8 +45,7 @@ sub prefix {
 sub extension {
 
     return ( output => 'extend',
-             select_macros => 'extend',
-             select_groups => 'extend' );
+             select_usrgrps => 'refer' );
 
 }
 
@@ -68,66 +67,47 @@ sub name {
 
 }
 
+sub usergroups {
+
+    ## accessor for usergroups
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        die 'Accessor usergroups called as mutator';
+
+    } else {
+
+        my $usergroups = $self->{root}->fetch('UserGroup', params => { usrgrpids => [ map { $_->{usrgrpid} } @{$self->data->{usrgrps}} ] });
+        $self->{usergroups} = $usergroups;
+
+        return $self->{usergroups};
+
+    }
+
+}
+
 1;
 __END__
 =pod
 
 =head1 NAME
 
-Zabbix::API::Host -- Zabbix host objects
+Zabbix::API::User -- Zabbix user objects
 
 =head1 SYNOPSIS
 
-  use Zabbix::API::Host;
-  # fetch a single host by ID
-  my $host = $zabbix->fetch('Host', params => { filter => { hostid => 10105 } })->[0];
+  use Zabbix::API::User;
+  # fetch a single user by login ("alias")
+  my $user = $zabbix->fetch('User', params => { filter => { alias => 'luser' } })->[0];
   
   # and delete it
-  $host->delete;
-  
-  # fetch an item's host
-  my $item = $zabbix->fetch('Item', params => { filter => { itemid => 22379 } })->[0];
-  my $host_from_item = $item->host;
-  
-  # create a new host (local)
-    my $host = Zabbix::API::Host->new(
-        root => $zabbix,
-        data => {
-            'host'  => 'host.domain.tld',
-            'dns'   => 'host.domain.tld',
-            'ip'    => '127.0.0.1',
-            'port'  => 10050,
-            'useip' => 0,
-            'groups'        => [
-                { 'groupid'       => 1, },
-                { 'groupid'       => 2, },
-                { 'groupid'       => 3, },
-                { 'groupid'       => 4, },
-            ],
-            'templates'     => [
-                { 'templateid'    => 1, },
-                { 'templateid'    => 2,},
-                { 'templateid'    => 3, },
-            ],
-            'macros'                => [
-                {
-                    'value'         => '/cgi-bin/index.php?action=monitoring',
-                    'macro'         => '{$PATH}',
-                },
-                {
-                    'value'         => 'zabbix_monitoring',
-                    'macro'         => '{$SEARCH_STRING}',
-                },
-            ],
-            'proxy_hostid'  => 1,
-        },
-    );
-  # save the new host on the server (i.e. 'create' it)
-    $host->push();
+  $user->delete;
 
 =head1 DESCRIPTION
 
-Handles CRUD for Zabbix host objects.
+Handles CRUD for Zabbix user objects.
 
 This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
@@ -135,22 +115,29 @@ This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 
 =over 4
 
-=item items()
+=item usergroups()
 
-Accessor for the host's items.
+Returns an arrayref of the user's usergroups (possibly empty) as
+L<Zabbix::API::UserGroup> objects.
 
 =item name()
 
-Accessor for the host's name (the "host" attribute); returns the empty string if
-no name is set, for instance if the host has not been created on the server yet.
+Accessor for the user's name (the "alias" attribute).
 
 =item collides()
 
-This method returns a list of hosts colliding (i.e. matching) this one. If there
-if more than one colliding host found the implementation can not know
-on which one to perform updates and will bail out.
+This method returns a list of users colliding (i.e. matching) this
+one. If there if more than one colliding user found the implementation
+can not know on which one to perform updates and will bail out.
 
 =back
+
+=head1 BUGS AND ODDITIES
+
+Apparently when logging in via the web page Zabbix does not care about
+the case of your username (e.g. "admin", "Admin" and "ADMIN" will all
+work).  I have not tested this for filtering/searching/colliding
+users.
 
 =head1 SEE ALSO
 
@@ -162,7 +149,7 @@ Fabrice Gabolde <fabrice.gabolde@uperto.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 SFR
+Copyright (C) 2013 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GPLv3.
