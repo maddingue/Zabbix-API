@@ -13,7 +13,7 @@ use Zabbix::API::TestUtils;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 16;
+    plan tests => 18;
 
 } else {
 
@@ -71,6 +71,12 @@ is($user->data->{name}, 'Loki',
 is($same_user->id, $user->id, '... and the identical user has the same id ('.$user->id.')');
 
 is_deeply($user->usergroups, [], '... and the newly-created user belongs to no groups');
+
+lives_ok(sub { $user->add_to_usergroup('Guests') },
+         '... and adding a user to a usergroup works');
+
+is_deeply([ map { $_->data->{name} } @{$user->usergroups} ], ['Guests'],
+          '... and the newly-created user can be added to groups');
 
 lives_ok(sub { $user->delete }, '... and deleting a user works');
 

@@ -88,6 +88,44 @@ sub usergroups {
 
 }
 
+sub add_to_usergroup {
+
+    my ($self, $usergroup_or_name) = @_;
+    my $usergroup;
+
+    die 'User does not exist (yet?) on server'
+        unless $self->created;
+
+    if (ref $usergroup_or_name and eval { $usergroup_or_name->isa('Zabbix::API::UserGroup') }) {
+
+        # it's a UserGroup object, keep it
+        $usergroup = $usergroup_or_name;
+
+    } elsif (not ref $usergroup_or_name) {
+
+        warn "there";
+        $usergroup = $self->{root}->fetch('UserGroup', params => { filter => { name => $usergroup_or_name } })->[0];
+
+        unless ($usergroup) {
+
+            die 'Parameter to add_to_usergroup must be a Zabbix::API::UserGroup object or an existing usergroup name';
+
+        }
+
+    } else {
+
+        die 'Parameter to add_to_usergroup must be a Zabbix::API::UserGroup object or an existing usergroup name';
+
+    }
+
+    $self->{root}->query(method => 'usergroup.massAdd',
+                         params => { usrgrpids => [ $usergroup->id ],
+                                     userids => [ $self->id ] });
+
+    return $self;
+
+}
+
 1;
 __END__
 =pod
