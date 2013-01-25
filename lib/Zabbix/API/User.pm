@@ -5,7 +5,26 @@ use warnings;
 use 5.010;
 use Carp;
 
-use parent qw/Zabbix::API::CRUDE/;
+use parent qw/Exporter Zabbix::API::CRUDE/;
+
+use constant {
+    USER_TYPE_USER => 1,
+    USER_TYPE_ADMIN => 2,
+    USER_TYPE_SUPERADMIN => 3,
+};
+
+our @EXPORT_OK = qw/
+USER_TYPE_USER
+USER_TYPE_ADMIN
+USER_TYPE_SUPERADMIN/;
+
+our %EXPORT_TAGS = (
+    user_types => [
+        qw/USER_TYPE_USER
+        USER_TYPE_ADMIN
+        USER_TYPE_SUPERADMIN/
+    ],
+    );
 
 sub id {
 
@@ -173,6 +192,20 @@ one. If there if more than one colliding user found the implementation
 can not know on which one to perform updates and will bail out.
 
 =back
+
+=head1 EXPORTS
+
+User types are implemented as constants:
+
+  USER_TYPE_USER
+  USER_TYPE_ADMIN
+  USER_TYPE_SUPERADMIN
+
+Promote (or demote) users by setting their C<$user->data->{type}>
+attribute to one of these.
+
+Nothing is exported by default; you can use the tag C<:user_types> (or
+import by name).
 
 =head1 BUGS AND ODDITIES
 
