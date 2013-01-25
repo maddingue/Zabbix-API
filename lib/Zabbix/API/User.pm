@@ -157,6 +157,11 @@ This is a subclass of C<Zabbix::API::CRUDE>; see there for inherited methods.
 Returns an arrayref of the user's usergroups (possibly empty) as
 L<Zabbix::API::UserGroup> objects.
 
+=item add_to_usergroup(USERGROUP_OR_NAME)
+
+Takes a L<Zabbix::API::UserGroup> instance or a valid usergroup name,
+and adds the current user to the group.  Returns C<$self>.
+
 =item name()
 
 Accessor for the user's name (the "alias" attribute).
