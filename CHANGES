@@ -1,3 +1,14 @@
+January 25, 2013 - Version 0.005
+  * Hostgroup class:
+    * name() accessor
+    * hosts() accessor
+  * Template support from Chris Larsen
+  * Proxy support from Chris Larsen
+  * Item class:
+    * history() accessor
+  * User support
+  * UserGroup support
+
 February 23, 2012 - Version 0.004
   * Trigger support
   * Action support
