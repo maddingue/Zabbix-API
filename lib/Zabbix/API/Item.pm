@@ -218,6 +218,22 @@ sub history {
 
 }
 
+sub delay {
+
+    ## mutator for the item's polling period
+
+    my ($self, $value) = @_;
+
+    if ($value) {
+
+        $self->data->{delay} = $value;
+
+    }
+
+    return $self->data->{delay};
+
+}
+
 1;
 __END__
 =pod
@@ -294,6 +310,15 @@ C<PARAMS> should be a hash containing arguments for the C<history.get> method
 time_from and time_till keys (with UNIX timestamps as values) are mandatory.
 The C<itemids> and C<output> parameters are already set and cannot be
 overwritten by the contents of C<PARAMS>.
+
+=item delay(NEW_DELAY)
+
+Mutator for the item's C<delay> value; that is, the polling period in
+seconds.  This is just a shortcut to set C<delay> in the C<data>
+hashref.  The method doesn't call C<pull()> or C<push()>, you need to
+do it manually.
+
+Returns the newly-set value.
 
 =back
 
