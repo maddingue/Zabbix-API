@@ -3,7 +3,7 @@ use Test::Exception;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 9;
+    plan tests => 11;
 
 } else {
 
@@ -28,7 +28,7 @@ dies_ok(sub { $zabber->query(method => 'item.get',
                                                      key_ => 'system.uptime' } }) },
         '... and querying Zabbix with no auth cookie fails (assuming no API access is given to the public)');
 
-eval { $zabber->login(user => 'api_access', password => 'api') };
+eval { $zabber->login(user => 'apiuser', password => 'apipass') };
 
 ok($zabber->cookie,
    '... and authenticating with correct login/pw succeeds');
@@ -37,6 +37,13 @@ ok($zabber->query(method => 'item.get',
                   params => { filter => { host => 'Zabbix Server',
                                           key_ => 'system.uptime' } }),
    '... and querying Zabbix with auth cookie succeeds (assuming API access given to this user)');
+
+ok($zabber->fetch_single('Item', params => { itemids => [ 18496 ] }),
+   '... and fetch_single does not complain when getting a unique item');
+
+throws_ok(sub { $zabber->fetch_single('Item', params => { itemids => [ 18496, 18502] }) },
+          qr/Too many results for 'fetch_single': expected 0 or 1, got \d+/,
+          '... and fetch_single throws an exception when fetching an item that is not unique');
 
 TODO: {
 

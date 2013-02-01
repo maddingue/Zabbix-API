@@ -316,6 +316,23 @@ sub fetch {
 
 }
 
+sub fetch_single {
+
+    my ($self, @args) = @_;
+
+    my $results = $self->fetch(@args);
+    my $result_count = scalar @{$results};
+
+    if ($result_count > 1) {
+
+        croak qq{Too many results for 'fetch_single': expected 0 or 1, got $result_count"};
+
+    }
+
+    return $results->[0];
+
+}
+
 1;
 __END__
 =pod
@@ -434,6 +451,15 @@ by specialized subclasses provided in the distribution).  The string
 C<Zabbix::API::> will be prepended if it is missing.
 
 Returns an arrayref of CLASS instances.
+
+=item fetch_single(CLASS, [params => HASHREF])
+
+Like C<fetch>, but also checks how many objects the server sent back.
+If no objects were sent, returns C<undef>.  If one object was sent,
+returns that.  If more objects were sent, throws an exception.  This
+helps against malformed queries; Zabbix tends to return B<all> objects
+of a class when a query contains strange parameters (like "searhc" or
+"fliter").
 
 =item useragent
 
