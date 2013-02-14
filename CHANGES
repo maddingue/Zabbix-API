@@ -1,3 +1,9 @@
+February 14, 2013 - Version 0.006
+  * User class:
+    * set_password() method
+  * API class:
+    * fetch_single method
+
 January 25, 2013 - Version 0.005
   * Hostgroup class:
     * name() accessor
