@@ -144,6 +144,14 @@ sub add_to_usergroup {
 
 }
 
+sub set_password {
+
+    my ($self, $password) = @_;
+    $self->data->{passwd} = $password;
+    return $self;
+
+}
+
 1;
 __END__
 =pod
@@ -180,6 +188,11 @@ L<Zabbix::API::UserGroup> objects.
 
 Takes a L<Zabbix::API::UserGroup> instance or a valid usergroup name,
 and adds the current user to the group.  Returns C<$self>.
+
+=item set_password(NEW_PASSWORD)
+
+Sets the user's password.  The modified user is not pushed
+automatically to the server.
 
 =item name()
 
