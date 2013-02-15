@@ -527,7 +527,7 @@ Fabrice Gabolde <fabrice.gabolde@uperto.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 SFR
+Copyright (C) 2011, 2012, 2013 SFR
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the GPLv3.
