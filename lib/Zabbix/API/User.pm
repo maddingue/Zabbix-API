@@ -107,13 +107,11 @@ sub usergroups {
 
 }
 
-sub add_to_usergroup {
+sub _usergroup_or_name_to_usergroup {
 
-    my ($self, $usergroup_or_name) = @_;
+    my $zabbix = shift;
+    my $usergroup_or_name = shift;
     my $usergroup;
-
-    die 'User does not exist (yet?) on server'
-        unless $self->created;
 
     if (ref $usergroup_or_name and eval { $usergroup_or_name->isa('Zabbix::API::UserGroup') }) {
 
@@ -122,23 +120,52 @@ sub add_to_usergroup {
 
     } elsif (not ref $usergroup_or_name) {
 
-        $usergroup = $self->{root}->fetch('UserGroup', params => { filter => { name => $usergroup_or_name } })->[0];
+        $usergroup = $zabbix->fetch('UserGroup', params => { filter => { name => $usergroup_or_name } })->[0];
 
         unless ($usergroup) {
 
-            die 'Parameter to add_to_usergroup must be a Zabbix::API::UserGroup object or an existing usergroup name';
+            die 'Parameter to add_to_usergroup or set_usergroups must be a Zabbix::API::UserGroup object or an existing usergroup name';
 
         }
 
     } else {
 
-        die 'Parameter to add_to_usergroup must be a Zabbix::API::UserGroup object or an existing usergroup name';
+        die 'Parameter to add_to_usergroup or set_usergroups must be a Zabbix::API::UserGroup object or an existing usergroup name';
 
     }
+
+    return $usergroup;
+
+}
+
+sub add_to_usergroup {
+
+    my ($self, $usergroup_or_name) = @_;
+    my $usergroup = _usergroup_or_name_to_usergroup($self->{root}, $usergroup_or_name);
+
+    die 'User does not exist (yet?) on server'
+        unless $self->created;
 
     $self->{root}->query(method => 'usergroup.massAdd',
                          params => { usrgrpids => [ $usergroup->id ],
                                      userids => [ $self->id ] });
+
+    return $self;
+
+}
+
+sub set_usergroups {
+
+    my ($self, @list_of_usergroups_or_names) = @_;
+
+    die 'User does not exist (yet?) on server'
+        unless $self->created;
+
+    my @list_of_usergroups = map { _usergroup_or_name_to_usergroup($self->{root}, $_) } @list_of_usergroups_or_names;
+
+    $self->{root}->query(method => 'user.update',
+                         params => { userid => $self->id,
+                                     usrgrps => [ map { $_->id } @list_of_usergroups ] });
 
     return $self;
 
@@ -189,6 +216,12 @@ L<Zabbix::API::UserGroup> objects.
 Takes a L<Zabbix::API::UserGroup> instance or a valid usergroup name,
 and adds the current user to the group.  Returns C<$self>.
 
+=item set_usergroups(LIST_OF_USERGROUPS_OR_NAMES)
+
+Takes a list of L<Zabbix::API::UserGroup> instances or valid usergroup
+names, and sets the user/usergroup relationship appropriately.
+Returns C<$self>.
+
 =item set_password(NEW_PASSWORD)
 
 Sets the user's password.  The modified user is not pushed
@@ -226,6 +259,10 @@ Apparently when logging in via the web page Zabbix does not care about
 the case of your username (e.g. "admin", "Admin" and "ADMIN" will all
 work).  I have not tested this for filtering/searching/colliding
 users.
+
+=head2 WHERE'S THE remove_from_usergroup METHOD?
+
+L<This|https://support.zabbix.com/browse/ZBX-6124> is where it is.
 
 =head1 SEE ALSO
 
