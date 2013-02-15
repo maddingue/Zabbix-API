@@ -1,3 +1,9 @@
+February 15, 2013 - Version 0.007
+  * User class:
+    * set_usergroups() method
+  * Removed stash misfeature.  Since it never worked no one should be
+    impacted...
+
 February 14, 2013 - Version 0.006
   * User class:
     * set_password() method
