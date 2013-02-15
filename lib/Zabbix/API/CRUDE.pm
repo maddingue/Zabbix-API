@@ -80,17 +80,6 @@ sub pull {
                                                  $self->extension
                                              })->[0];
 
-        # uniquify objects
-        if (my $replacement = $self->{root}->refof($self)) {
-
-            $self = $replacement;
-
-        } else {
-
-            $self->{root}->reference($self);
-
-        }
-
     }
 
     return $self;
@@ -188,10 +177,6 @@ sub delete {
 
         $self->{root}->query(method => $self->prefix('.delete'),
                              params => [ $self->id ]);
-
-        delete $self->{root}->{stash}->{$self->prefix('s')}->{$self->id};
-
-        $self->{root}->dereference($self);
 
     } else {
 

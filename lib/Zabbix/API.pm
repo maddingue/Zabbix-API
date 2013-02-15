@@ -30,8 +30,6 @@ sub new {
     $self->{env_proxy} = 0 unless exists $self->{env_proxy};
     $self->{lazy} = 0 unless exists $self->{lazy};
 
-    $self->{stash} = {};
-
     $self->{ua} = LWP::UserAgent->new(agent => 'Zabbix API client (libwww-perl)',
                                       from => 'fabrice.gabolde@uperto.com',
                                       show_progress => $self->{verbosity},
@@ -52,25 +50,6 @@ sub useragent {
 
 }
 
-sub stash {
-
-    ## mutator for stash
-
-    my ($self, $value) = @_;
-
-    if (defined $value) {
-
-        $self->{stash} = $value;
-        return $self->{stash};
-
-    } else {
-
-        return $self->{stash};
-
-    }
-
-}
-
 sub verbosity {
 
     ## mutator for verbosity
@@ -88,34 +67,6 @@ sub verbosity {
         return $self->{verbosity};
 
     }
-
-}
-
-sub reference {
-
-    my ($self, $thing) = @_;
-
-    $self->{stash}->{$thing->prefix}->{$thing->id} = $thing;
-
-    return $self;
-
-}
-
-sub dereference {
-
-    my ($self, $thing) = @_;
-
-    delete $self->{stash}->{$thing->prefix}->{$thing->id};
-
-    return $self;
-
-}
-
-sub refof {
-
-    my ($self, $thing) = @_;
-
-    return $self->{stash}->{$thing->prefix}->{$thing->id};
 
 }
 
@@ -297,20 +248,6 @@ sub fetch {
                                 });
 
     my $things = [ map { $class->new(root => $self, data => $_)  } @{$response} ];
-
-    foreach my $thing (@{$things}) {
-
-        if (my $replacement = $self->refof($thing)) {
-
-            $thing = $replacement;
-
-        } else {
-
-            $self->reference($thing);
-
-        }
-
-    }
 
     return $things;
 
@@ -495,35 +432,6 @@ C<Data::Dumper>) the queries sent to the server and the responses received.
 
 =head1 LOW-LEVEL ACCESS
 
-A few methods are not intended for general consumption, but you never know.
-Plus it gives me a space to document them and raises POD coverage.
-
-=over 4
-
-=item reference(OBJECT)
-
-"Indexes" the object in a local stash.  The C<fetch> method (and the objects'
-C<pull>) plugs into this so that you have only one real object, and modifying a
-host directly and modifying an item's host (via C<< ->host >> is the same thing.
-
-=item dereference(OBJECT)
-
-Removes the object's index in the local stash.  This is called by the objects'
-C<delete> method.
-
-=item refof(OBJECT)
-
-Returns the correct reference to an object fetched from the server; in other
-words, looks in the stash for an object that has the same C<id>.  This is used
-in indexing objects, to ensure that the stashed objects are updated instead of
-just creating doubles.
-
-=item stash([STASH])
-
-Mutator for the local stash (a hashref of type => id => object).
-
-=back
-
 Several attributes are available if you want to dig into the class' internals,
 through the standard blessed-hash-as-an-instance mechanism.  Those are:
 
@@ -575,9 +483,7 @@ don't know about each other!  Of course this is also true if someone else is
 fiddling with the hosts directly on the web interface or in any other way.
 
 To work around this, you have to C<pull()> just before you start changing
-things.  Currently C<Zabbix::API> does its best to return existing references
-when you C<fetch()> from the server; ideally C<$host> and C<$same_host> would
-also point to the same object, but they don't.
+things.
 
 =head2 MOOSE, ABSENCE OF
 
