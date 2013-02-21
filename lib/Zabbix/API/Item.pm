@@ -167,6 +167,31 @@ sub name {
 
 }
 
+sub graphs {
+
+    ## accessor for this item's graphs
+
+    my ($self, $value) = @_;
+
+    if (defined $value) {
+
+        croak 'Accessor graphs called as mutator';
+
+    } else {
+
+        unless (exists ($self->{graphs})) {
+
+            my $graphs = $self->{root}->fetch('Graph', params => { itemids => [ $self->id ] });
+            $self->{graphs} = $graphs;
+
+        }
+
+    }
+
+    return $self->{graphs};
+
+}
+
 sub host {
 
     ## accessor for host
