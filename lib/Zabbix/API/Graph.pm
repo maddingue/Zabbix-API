@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use 5.010;
 use Carp;
-use Params::Validate qw/:all/;
 
+use Params::Validate qw/validate :types/;
 use parent qw/Zabbix::API::CRUDE/;
 
 sub new { 
@@ -90,23 +90,26 @@ sub items {
 
 }
 
-
 sub url {
 
     ## return url for a graph
+
     my $self = shift;
 
-    my %args = validate(@_, { base_url => 1,
-                   width => { type => SCALAR, optional => 1, regex => qr/^\d+$/ },
-                   period => { type => SCALAR, optional => 1, regex => qr/^\d+$/ },
-                   start_time => { type => SCALAR, optional => 1, regex => qr/^\d{14}$/ } });
+    my $base_url = $self->{root}->{server};
+    $base_url =~ s{(?:/api_jsonrpc\.php)?$}{};
 
-    my $url = $args{base_url}.'/chart2.php?graphid='.$self->id;
-    $url .= '&width='.$args{width} 	if $args{width};
-    $url .= '&period='.$args{period} 	if $args{period};
-    $url .= '&stime='.$args{start_time}	if $args{start_time};
+    my %args = validate(@_, { width => { type => SCALAR, optional => 1, regex => qr/^\d+$/ },
+                              period => { type => SCALAR, optional => 1, regex => qr/^\d+$/ },
+                              start_time => { type => SCALAR, optional => 1, regex => qr/^\d{14}$/ } });
+
+    my $url = $base_url.'/chart2.php?graphid='.$self->id;
+    $url .= '&width='.$args{width} if $args{width};
+    $url .= '&period='.$args{period} if $args{period};
+    $url .= '&stime='.$args{start_time} if $args{start_time};
 
     return $url;
+
 }
 
 sub push {
