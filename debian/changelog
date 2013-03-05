@@ -1,3 +1,9 @@
+libzabbix-api-perl (0.008-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Fabrice Gabolde <fgabolde@uperto.com>  Tue, 05 Mar 2013 14:33:23 +0100
+
 libzabbix-api-perl (0.007) unstable; urgency=low
 
   * New upstream release.
