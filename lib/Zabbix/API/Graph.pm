@@ -239,6 +239,29 @@ server if they are removed from the graph, however.
 
 Overriden from C<Zabbix::API::CRUDE>.
 
+=item url([width => WIDTH], [period => PERIOD], [start_time => START_TIME])
+
+This method returns a URL to an image on the Zabbix server.  The image
+of width C<WIDTH> will represent the current graph, plotted for data
+starting at C<START_TIME> (a UNIX timestamp) over C<PERIOD> seconds.
+It uses the current connection's host name to guess what path to base
+the URL on.
+
+All three parameters are optional.
+
+If the current user agent has cookies enabled, you can even fetch the
+image directly, since your API session is completely valid for all
+regular requests:
+
+  my $zabbix = Zabbix::API->new(server => ...,
+                                ua => LWP::UserAgent->new(cookie_jar => { file => 'cookie.jar' }),
+                                ...);
+  my $graph = $zabbix->fetch_single('Graph', ...);
+  my $response = $zabbix->{ua}->get($graph->url);
+  open my $image, '>', 'graph.png' or die $!;
+  $image->print($response->decoded_content);
+  $image->close;
+
 =back
 
 =head1 SEE ALSO

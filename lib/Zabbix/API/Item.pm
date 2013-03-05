@@ -321,6 +321,11 @@ Accessor for a local C<host> attribute, which it also happens to set from the
 server data if it isn't set already.  The host is an instance of
 C<Zabbix::API::Host>.
 
+=item graphs()
+
+Like C<host()>, returning an arrayref of C<Zabbix::API::Graph>
+instances in which this item is involved.
+
 =item history(PARAMS)
 
 Accessor for the item's history data.  Calling this method does not store the
