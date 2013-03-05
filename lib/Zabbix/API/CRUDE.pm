@@ -23,6 +23,23 @@ sub id {
 
 }
 
+sub node_id {
+
+    my ($self, $value) = @_;
+    
+    if (defined $value) {
+
+        croak 'Accessor node_id() called as mutator';
+
+    }
+
+    return unless $self->id;
+    return unless $self->id > 100000000000000;
+    # this is how Zabbix operates, don't blame me
+    return int($self->id/100000000000000);
+
+}
+
 sub prefix {
 
     croak 'Class '.(ref shift).' does not implement required method prefix()';
@@ -245,6 +262,13 @@ This method must implement a mutator for the relevant unique Zabbix ID (e.g. for
 hosts, C<hostid>).  What this means is, it must accept zero or one argument; if
 zero, return the current ID or undef; if one, set the current ID in the raw data
 hash (see the C<data()> method) and return it.
+
+=item node_id()
+
+This method returns the current object's node ID, for distributed
+setups.  For objects in non-distributed setups, whose IDs do not
+include a node ID, and objects that have never been pushed to the
+server, this method will return false.
 
 =item prefix([SUFFIX]) (abstract method)
 
