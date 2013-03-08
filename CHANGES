@@ -1,3 +1,6 @@
+March 8, 2013 - Version 0.009
+  * MediaType support, provided by Ray Link
+
 March 5, 2013 - Version 0.008
   * Item class:
     * graphs() accessor
