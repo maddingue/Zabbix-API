@@ -12,7 +12,7 @@ use Scalar::Util qw/weaken/;
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 sub new {
 
