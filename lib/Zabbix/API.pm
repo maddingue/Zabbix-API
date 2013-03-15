@@ -21,7 +21,8 @@ sub new {
                               verbosity => 0,
                               env_proxy => 0,
                               lazy => 0,
-                              ua => { optional => 1 } });
+                              ua => { optional => 1 },
+                              cache => { optional => 1 } });
 
     my $self = \%args;
 
@@ -47,6 +48,12 @@ sub new {
 sub useragent {
 
     return shift->{ua};
+
+}
+
+sub cache {
+
+    return shift->{cache};
 
 }
 
@@ -255,9 +262,25 @@ sub fetch {
 
 sub fetch_single {
 
-    my ($self, @args) = @_;
+    my ($self, $class, %args) = @_;
 
-    my $results = $self->fetch(@args);
+    my $results;
+
+    if ($self->cache) {
+
+        $self->cache->remove(\%args) if ($args{refresh_cache});
+
+        # Cache is set up, try to use it
+        $results = $self->cache->compute(\%args, undef,
+                                         sub { $self->fetch(%args) });
+
+    } else {
+
+        # Cache is not set up
+        $results = $self->fetch(%args);
+
+    }
+
     my $result_count = scalar @{$results};
 
     if ($result_count > 1) {
