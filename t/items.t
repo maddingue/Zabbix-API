@@ -9,7 +9,7 @@ use Zabbix::API::TestUtils;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 10;
+    plan tests => 9;
 
 } else {
 
@@ -37,9 +37,6 @@ ok($zabbix_uptime->created,
 my $host_from_item = $zabbix_uptime->host;
 
 my $host = $zabber->fetch('Host', params => { search => { host => 'Zabbix Server' } })->[0];
-
-is($host_from_item, $host,
-   '... and the host accessor accesses the correct host');
 
 is_deeply($host_from_item, $host,
           '... or at least they are identical');
