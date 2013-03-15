@@ -120,7 +120,7 @@ sub _usergroup_or_name_to_usergroup {
 
     } elsif (not ref $usergroup_or_name) {
 
-        $usergroup = $zabbix->fetch('UserGroup', params => { filter => { name => $usergroup_or_name } })->[0];
+        $usergroup = $zabbix->fetch_single('UserGroup', params => { filter => { name => $usergroup_or_name } });
 
         unless ($usergroup) {
 
