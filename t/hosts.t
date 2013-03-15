@@ -9,7 +9,7 @@ use Zabbix::API::TestUtils;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 9;
+    plan tests => 8;
 
 } else {
 
@@ -63,19 +63,6 @@ if ($@) { diag "Caught exception: $@" };
 
 ok($new_host->created,
    '... and pushing it to the server creates a new host');
-
-TODO: {
-
-    local $TODO = 'Merging fetched objects does not work';
-
-    my $existing = Zabbix::API::Host->new(root => $zabber,
-                                          data => { host => 'Another Server' });
-
-    $existing->push;
-
-    is($existing, $new_host, '... and trying to push an existing host as new merges both objects');
-
-}
 
 eval { $new_host->delete };
 
