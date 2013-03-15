@@ -9,7 +9,7 @@ use Zabbix::API::TestUtils;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 23;
+    plan tests => 22;
 
 } else {
 
@@ -93,19 +93,6 @@ push @{$screen->items}, ({ graph => $graph, 'x' => 0, 'y' => 0 });
 $screen->push;
 
 is(@{$screen->items}, 1, '... and items can be pushed onto the screen');
-
-TODO: {
-
-    local $TODO = 'Merging fetched objects does not work';
-
-    my $existing = Zabbix::API::Screen->new(root => $zabber,
-                                            data => { name => 'Custom screen' });
-
-    $existing->push;
-
-    is($existing, $screen, '... and trying to push an existing screen as new merges both objects');
-
-}
 
 lives_ok(sub { $screen->delete }, '... and deleting a screen works');
 
