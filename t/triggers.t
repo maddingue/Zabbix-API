@@ -51,30 +51,46 @@ my $new_trigger = Zabbix::API::Trigger->new(root => $zabber,
 isa_ok($new_trigger, 'Zabbix::API::Trigger',
        '... and a trigger created manually');
 
-eval { $new_trigger->push };
+SKIP: {
 
-if ($@) { diag "Caught exception: $@" };
+    eval { $new_trigger->push };
 
-ok($new_trigger->created,
-   '... and pushing it to the server creates a new trigger');
+    if (my $error = $@) {
 
-my $triggers_again = $zabber->fetch('Trigger', params => { search => { description => 'Another Trigger' },
-                                                     hostids => [ $host->id ],
-                                                     templated => 0 });
+        diag "Caught exception: $@";
+        if ($error =~ m/\[ CTrigger::create \] No permissions !/) {
 
-is(@{$triggers_again}, 1, '... and the just-created trigger can be fetched');
+            # We're dealing with an old version of the API (this happens
+            # even when the API user is a superadmin...)
 
-is_deeply([ map { $_->id } @{$new_trigger->hosts} ], [ $host->id ],
-   q{... and the trigger's 'hosts' accessor works});
+            skip 'This version of the API has a bugged trigger creation method', 5;
 
-is_deeply([ map { $_->id } @{$new_trigger->items} ], [ $item->id ],
-   q{... and the trigger's 'items' accessor works});
+        }
 
-eval { $new_trigger->delete };
+    };
 
-if ($@) { diag "Caught exception: $@" };
+    ok($new_trigger->created,
+       '... and pushing it to the server creates a new trigger');
 
-ok(!$new_trigger->created,
-   '... and calling its delete method removes it from the server');
+    my $triggers_again = $zabber->fetch('Trigger', params => { search => { description => 'Another Trigger' },
+                                                               hostids => [ $host->id ],
+                                                               templated => 0 });
+
+    is(@{$triggers_again}, 1, '... and the just-created trigger can be fetched');
+
+    is_deeply([ map { $_->id } @{$new_trigger->hosts} ], [ $host->id ],
+              q{... and the trigger's 'hosts' accessor works});
+
+    is_deeply([ map { $_->id } @{$new_trigger->items} ], [ $item->id ],
+              q{... and the trigger's 'items' accessor works});
+
+    eval { $new_trigger->delete };
+
+    if ($@) { diag "Caught exception: $@" };
+
+    ok(!$new_trigger->created,
+       '... and calling its delete method removes it from the server');
+
+}
 
 eval { $zabber->logout };
