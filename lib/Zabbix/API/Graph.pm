@@ -257,7 +257,7 @@ regular requests:
                                 ua => LWP::UserAgent->new(cookie_jar => { file => 'cookie.jar' }),
                                 ...);
   my $graph = $zabbix->fetch_single('Graph', ...);
-  my $response = $zabbix->{ua}->get($graph->url);
+  my $response = $zabbix->useragent->get($graph->url);
   open my $image, '>', 'graph.png' or die $!;
   $image->print($response->decoded_content);
   $image->close;
