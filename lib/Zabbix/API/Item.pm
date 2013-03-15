@@ -206,12 +206,8 @@ sub host {
 
         unless (exists $self->{host}) {
 
-            my $hosts = $self->{root}->fetch('Host', params => { hostids => [ $self->data->{hostid} ] });
-
-            croak 'Unexpectedly found more than one host for a given item'
-                if @{$hosts} > 1;
-
-            $self->{host} = $hosts->[0];
+            my $host = $self->{root}->fetch_single('Host', params => { hostids => [ $self->data->{hostid} ] });
+            $self->{host} = $host;
 
         }
 
