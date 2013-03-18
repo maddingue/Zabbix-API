@@ -3,7 +3,7 @@ use Test::Exception;
 
 if ($ENV{ZABBIX_SERVER}) {
 
-    plan tests => 11;
+    plan tests => 13;
 
 } else {
 
@@ -44,6 +44,14 @@ ok($zabber->fetch_single('Item', params => { itemids => [ 18496 ] }),
 throws_ok(sub { $zabber->fetch_single('Item', params => { itemids => [ 18496, 18502] }) },
           qr/Too many results for 'fetch_single': expected 0 or 1, got \d+/,
           '... and fetch_single throws an exception when fetching an item that is not unique');
+
+throws_ok(sub { $zabber->fetch('Foobar', params => {}) },
+          qr/Could not load class 'Zabbix::API::Foobar'/,
+          '... and fetch throws an exception when trying to fetch on a module name that cannot be loaded');
+
+throws_ok(sub { $zabber->fetch('Utils', params => {}) },
+          qr/Class 'Zabbix::API::Utils' does not implement required '.*' method/,
+          '... and fetch throws an exception when trying to fetch on a module name that is not CRUDdy');
 
 TODO: {
 

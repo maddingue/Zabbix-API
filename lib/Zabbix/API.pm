@@ -235,6 +235,13 @@ sub fetch {
 
     }
 
+    $class->can('new')
+        or croak "Class '$class' does not implement required 'new' method";
+    $class->can('prefix')
+        or croak "Class '$class' does not implement required 'prefix' method";
+    $class->can('extension')
+        or croak "Class '$class' does not implement required 'extension' method";
+
     my $response = $self->query(method => $class->prefix('.get'),
                                 params => {
                                     %{$args{params}},
