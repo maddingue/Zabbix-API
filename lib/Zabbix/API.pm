@@ -412,7 +412,7 @@ C<Zabbix::API::> will be prepended if it is missing.
 
 Returns an arrayref of CLASS instances.
 
-=item fetch_single(CLASS, [params => HASHREF])
+=item fetch_single(CLASS, [params => HASHREF], [refresh_cache => BOOL])
 
 Like C<fetch>, but also checks how many objects the server sent back.
 If no objects were sent, returns C<undef>.  If one object was sent,
@@ -420,6 +420,10 @@ returns that.  If more objects were sent, throws an exception.  This
 helps against malformed queries; Zabbix tends to return B<all> objects
 of a class when a query contains strange parameters (like "searhc" or
 "fliter").
+
+The results of this method are cached (for a given set of C<params>),
+if the cache has been setup.  The method can be forced to refresh the
+cache if C<refresh_cache> is set to a true value.
 
 =item useragent
 
