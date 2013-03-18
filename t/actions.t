@@ -42,40 +42,58 @@ my $new_trigger = Zabbix::API::Trigger->new(root => $zabber,
                                             data => { description => 'Another Trigger',
                                                       expression => '{Zabbix Server:system.uptime.last(0)}<600', });
 
-$new_trigger->push;
+SKIP: {
 
-my $new_action = Zabbix::API::Action->new(root => $zabber,
-                                          data => { name => 'Another Action',
-                                                    eventsource => ACTION_EVENTSOURCE_TRIGGERS,
-                                                    evaltype => ACTION_EVAL_TYPE_AND,
-                                                    conditions => [ { conditiontype => ACTION_CONDITION_TYPE_TRIGGER_NAME,
-                                                                      operator => ACTION_CONDITION_OPERATOR_LIKE,
-                                                                      value => $new_trigger->data->{description} } ],
-                                                    operations => [ { operationtype => ACTION_OPERATION_TYPE_MESSAGE,
-                                                                      shortdata => '{TRIGGER.NAME}: {STATUS}',
-                                                                      longdata => '{TRIGGER.NAME}: {STATUS}' } ]
-                                                    });
+    eval { $new_trigger->push };
 
-isa_ok($new_action, 'Zabbix::API::Action',
-       '... and an action created manually');
+    if (my $error = $@) {
 
-eval { $new_action->push };
+        diag "Caught exception: $@";
+        if ($error =~ m/\[ CTrigger::create \] No permissions !/) {
 
-if ($@) { diag "Caught exception: $@" };
+            # We're dealing with an old version of the API (this happens
+            # even when the API user is a superadmin...)
 
-ok($new_action->created,
-   '... and pushing it to the server creates a new action');
+            skip 'This version of the API has a bugged trigger creation method', 4;
 
-my $actions_again = $zabber->fetch('Action', params => { search => { name => 'Another Action' } });
+        }
 
-is(@{$actions_again}, 1, '... and the just-created action can be fetched');
+    };
 
-eval { $new_action->delete };
-$new_trigger->delete;
+    my $new_action = Zabbix::API::Action->new(root => $zabber,
+                                              data => { name => 'Another Action',
+                                                        eventsource => ACTION_EVENTSOURCE_TRIGGERS,
+                                                        evaltype => ACTION_EVAL_TYPE_AND,
+                                                        conditions => [ { conditiontype => ACTION_CONDITION_TYPE_TRIGGER_NAME,
+                                                                          operator => ACTION_CONDITION_OPERATOR_LIKE,
+                                                                          value => $new_trigger->data->{description} } ],
+                                                        operations => [ { operationtype => ACTION_OPERATION_TYPE_MESSAGE,
+                                                                          shortdata => '{TRIGGER.NAME}: {STATUS}',
+                                                                          longdata => '{TRIGGER.NAME}: {STATUS}' } ]
+                                              });
 
-if ($@) { diag "Caught exception: $@" };
+    isa_ok($new_action, 'Zabbix::API::Action',
+           '... and an action created manually');
 
-ok(!$new_action->created,
-   '... and calling its delete method removes it from the server');
+    eval { $new_action->push };
+
+    if ($@) { diag "Caught exception: $@" };
+
+    ok($new_action->created,
+       '... and pushing it to the server creates a new action');
+
+    my $actions_again = $zabber->fetch('Action', params => { search => { name => 'Another Action' } });
+
+    is(@{$actions_again}, 1, '... and the just-created action can be fetched');
+
+    eval { $new_action->delete };
+    $new_trigger->delete;
+
+    if ($@) { diag "Caught exception: $@" };
+
+    ok(!$new_action->created,
+       '... and calling its delete method removes it from the server');
+
+}
 
 eval { $zabber->logout };
