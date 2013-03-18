@@ -272,12 +272,12 @@ sub fetch_single {
 
         # Cache is set up, try to use it
         $results = $self->cache->compute(\%args, undef,
-                                         sub { $self->fetch(%args) });
+                                         sub { $self->fetch($class, %args) });
 
     } else {
 
         # Cache is not set up
-        $results = $self->fetch(%args);
+        $results = $self->fetch($class, %args);
 
     }
 
