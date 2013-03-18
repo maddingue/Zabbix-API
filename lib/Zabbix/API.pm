@@ -158,28 +158,15 @@ sub raw_query {
     if ($@) {
 
         my $error = $@;
-
         confess $error;
 
     }
 
-    given ($self->{verbosity}) {
+    given ($self->verbosity) {
 
-        when (1) {
-
-            print $response->as_string;
-
-        }
-
-        when (2) {
-
-            print Dumper($response);
-
-        }
-
-        default {
-
-        }
+        when (1) { print $response->as_string; }
+        when (2) { print Dumper($response); }
+        default { }
 
     }
 
