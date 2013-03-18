@@ -21,6 +21,8 @@ use_ok('Zabbix::API::Macro');
 
 my $zabber = Zabbix::API::TestUtils::canonical_login;
 
+## No macros exist by default, create this one manually on the server.
+
 ok(my $default = $zabber->fetch('Macro', params => { search => { name => 'FOO' } })->[0],
    '... and a macro known to exist can be fetched');
 
