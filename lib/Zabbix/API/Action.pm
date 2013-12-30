@@ -2,10 +2,9 @@ package Zabbix::API::Action;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Exporter Zabbix::API::CRUDE/;
+use base qw/Exporter Zabbix::API::CRUDE/;
 
 use constant {
     ACTION_EVENTSOURCE_TRIGGERS => 0,

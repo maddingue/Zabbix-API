@@ -2,10 +2,9 @@ package Zabbix::API::Macro;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Zabbix::API::CRUDE/;
+use base qw/Zabbix::API::CRUDE/;
 
 use Scalar::Util qw/reftype/;
 use Zabbix::API::Host;
@@ -190,7 +189,8 @@ sub push {
 
     my ($self, $data) = @_;
 
-    $data //= $self->data;
+    $data = $self->data
+        unless defined $data;
 
     my $method;
     my $parameters;
@@ -200,7 +200,7 @@ sub push {
     if ($self->id
         and $self->created) {
 
-        say sprintf('Updating %s %s', $self->prefix, $self->id)
+        print sprintf('Updating %s %s', $self->prefix, $self->id)."\n"
             if $self->{root}->{verbosity};
 
         if ($self->globalp) {
@@ -233,7 +233,7 @@ sub push {
 
     } elsif (@colliders = $self->collides and $colliders[0]) {
 
-        say sprintf('Updating %s (match by collisions)', $self->prefix)
+        print sprintf('Updating %s (match by collisions)', $self->prefix)."\n"
             if $self->{root}->{verbosity};
 
         if (@colliders > 1) {
@@ -278,7 +278,7 @@ sub push {
 
     } else {
 
-        say 'Creating '.$self->prefix
+        print 'Creating '.$self->prefix."\n"
             if $self->{root}->{verbosity};
 
         if ($self->globalp) {

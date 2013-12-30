@@ -2,12 +2,11 @@ package Zabbix::API::Item;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
 use Params::Validate qw/validate validate_with :types/;
 
-use parent qw/Exporter Zabbix::API::CRUDE/;
+use base qw/Exporter Zabbix::API::CRUDE/;
 
 use constant {
     ITEM_TYPE_ZABBIX => 0,

@@ -2,7 +2,6 @@ package Zabbix::API;
 
 use strict;
 use warnings;
-use 5.010;
 
 use Params::Validate qw/:all/;
 use Carp qw/carp croak confess cluck/;
@@ -13,6 +12,8 @@ use JSON;
 use LWP::UserAgent;
 
 our $VERSION = '0.009';
+
+my $global_id = int(rand(10000));
 
 sub new {
 
@@ -144,8 +145,6 @@ sub raw_query {
 
     my ($self, %args) = @_;
 
-    state $global_id = int(rand(10000));
-
     # common parameters
     $args{'jsonrpc'} = '2.0';
     $args{'auth'} = $self->cookie || '';
@@ -162,13 +161,8 @@ sub raw_query {
 
     }
 
-    given ($self->verbosity) {
-
-        when (1) { print $response->as_string; }
-        when (2) { print Dumper($response); }
-        default { }
-
-    }
+    print $response->as_string if $self->verbosity == 1;
+    print Dumper($response) if $self->verbosity == 2;
 
     return $response;
 

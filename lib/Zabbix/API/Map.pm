@@ -2,10 +2,9 @@ package Zabbix::API::Map;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Exporter Zabbix::API::CRUDE/;
+use base qw/Exporter Zabbix::API::CRUDE/;
 
 # these do not exist in Zabbix but we make them up for consistency's sake
 use constant {
@@ -144,14 +143,15 @@ sub push {
                 $item->{elementid} = $item->{host}->id;
 
                 # defaults -- no idea what good values for iconid_* would be
-                $item->{iconid_on} //= 0;
-                $item->{iconid_disabled} //= 0;
-                $item->{iconid_maintenance} //= 0;
-                $item->{iconid_off} //= 100100000000036;
-                $item->{iconid_unknown} //= 0;
+                $item->{iconid_on} = 0 unless defined $item->{iconid_on};
+                $item->{iconid_disabled} = 0 unless defined $item->{iconid_disabled};
+                $item->{iconid_maintenance} = 0 unless defined $item->{iconid_maintenance};
+                $item->{iconid_off} = 100100000000036 unless defined $item->{iconid_off};
+                $item->{iconid_unknown} = 0 unless defined $item->{iconid_unknown};
 
                 # use the hostname as a default label
-                $item->{label} //= $item->{host}->data->{host};
+                $item->{label} = $item->{host}->data->{host}
+                    unless defined $item->{label};
 
                 delete $item->{host};
 

@@ -2,10 +2,9 @@ package Zabbix::API::Trigger;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Zabbix::API::CRUDE/;
+use base qw/Zabbix::API::CRUDE/;
 
 sub id {
 

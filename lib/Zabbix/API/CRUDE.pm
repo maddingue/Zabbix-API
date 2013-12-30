@@ -2,17 +2,13 @@ package Zabbix::API::CRUDE;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
 sub new {
 
     my ($class, %args) = @_;
-
     my $self = \%args;
-
     bless $self, $class;
-
     return $self;
 
 }
@@ -127,13 +123,14 @@ sub push {
 
     my ($self, $data) = @_;
 
-    $data //= $self->data;
+    $data = $self->data
+        unless defined $data;
 
     my @colliders;
 
     if ($self->id and $self->created) {
 
-        say sprintf('Updating %s %s', $self->prefix, $self->id)
+        print sprintf('Updating %s %s', $self->prefix, $self->id)."\n"
             if $self->{root}->{verbosity};
 
         $self->{root}->query(method => $self->prefix('.update'),
@@ -147,7 +144,7 @@ sub push {
 
     } elsif (@colliders = $self->collides and $colliders[0]) {
 
-        say sprintf('Updating %s (match by collisions)', $self->prefix)
+        print sprintf('Updating %s (match by collisions)', $self->prefix)."\n"
             if $self->{root}->{verbosity};
 
         if (@colliders > 1) {
@@ -167,7 +164,7 @@ sub push {
 
     } else {
 
-        say 'Creating '.$self->prefix
+        print 'Creating '.$self->prefix."\n"
             if $self->{root}->{verbosity};
 
         my $id = $self->{root}->query(method => $self->prefix('.create'),
@@ -189,7 +186,7 @@ sub delete {
 
     if ($self->id) {
 
-        say sprintf('Deleting %s %s', $self->prefix, $self->id)
+        print sprintf('Deleting %s %s', $self->prefix, $self->id)."\n"
             if $self->{root}->{verbosity};
 
         $self->{root}->query(method => $self->prefix('.delete'),

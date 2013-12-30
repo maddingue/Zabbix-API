@@ -2,11 +2,10 @@ package Zabbix::API::Graph;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
 use Params::Validate qw/validate :types/;
-use parent qw/Zabbix::API::CRUDE/;
+use base qw/Zabbix::API::CRUDE/;
 
 sub new { 
 	my ($class, %args) = @_; 
@@ -118,7 +117,8 @@ sub push {
 
     my ($self, $data) = @_;
 
-    $data //= $self->data;
+    $data = $self->data
+        unless defined $data;
 
     foreach my $item (@{$data->{gitems}}) {
 
@@ -182,8 +182,9 @@ sub pull {
             [map {
                 { %{$_},
                   item =>
-                      $stash{$_->{itemid}} // Zabbix::API::Item->new(root => $self->{root},
-                                                                     data => { itemid => $_->{itemid} })->pull
+                      defined($stash{$_->{itemid}}) ? $stash{$_->{itemid}}
+                                                    : Zabbix::API::Item->new(root => $self->{root},
+                                                                             data => { itemid => $_->{itemid} })->pull
                 }
              }
              @{$self->items}]

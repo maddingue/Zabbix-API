@@ -2,10 +2,9 @@ package Zabbix::API::Script;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Exporter Zabbix::API::CRUDE/;
+use base qw/Exporter Zabbix::API::CRUDE/;
 
 use constant {
     SCRIPT_HOSTPERM_READ => 2,

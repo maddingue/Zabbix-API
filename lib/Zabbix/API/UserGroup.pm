@@ -2,10 +2,9 @@ package Zabbix::API::UserGroup;
 
 use strict;
 use warnings;
-use 5.010;
 use Carp;
 
-use parent qw/Zabbix::API::CRUDE/;
+use base qw/Zabbix::API::CRUDE/;
 
 use Zabbix::API::User;
 
@@ -98,7 +97,8 @@ sub push {
 
     my ($self, $data) = @_;
 
-    $data //= $self->data;
+    $data = $self->data
+        unless defined $data;
 
     foreach my $user (@{$data->{users}}) {
 
@@ -161,8 +161,9 @@ sub pull {
             [map {
                 { %{$_},
                   user =>
-                      $stash{$_->{userid}} // Zabbix::API::User->new(root => $self->{root},
-                                                                     data => { userid => $_->{userid} })->pull
+                      defined($stash{$_->{userid}}) ? $stash{$_->{userid}}
+                                                    : Zabbix::API::User->new(root => $self->{root},
+                                                                             data => { userid => $_->{userid} })->pull
                 }
              }
              @{$self->users}]
