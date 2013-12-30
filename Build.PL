@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
         'File::Spec' => 0
     },
     requires => {
-        'perl' => 5.010_001,
+        'perl' => 5.008,
         'JSON' => 0,
         'LWP' => 0,
         'Params::Validate' => 0
