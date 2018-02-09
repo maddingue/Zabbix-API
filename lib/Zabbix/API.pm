@@ -3,6 +3,7 @@ package Zabbix::API;
 use strict;
 use warnings;
 use 5.010;
+use experimental qw< switch >;
 
 use Params::Validate qw/:all/;
 use Carp qw/carp croak confess cluck/;
