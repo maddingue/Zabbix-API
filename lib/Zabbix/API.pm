@@ -151,6 +151,9 @@ sub raw_query {
     $args{'jsonrpc'} = '2.0';
     $args{'auth'} = $self->cookie || '';
     $args{'id'} = $global_id++;
+    $args{'params'} //= {};
+    delete $args{'auth'}
+        if grep /^$args{method}$/, qw< user.login apiinfo.version >;
 
     my $response = eval { $self->{ua}->post($self->{server},
                                             'Content-Type' => 'application/json-rpc',
